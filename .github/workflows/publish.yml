@@ -1,0 +1,43 @@
+name: Publish to Vault CDN
+
+# Builds Jo Wilder and the Capitol Case with `make build` and publishes it to the Vault staging CDN:
+#   https://builds.vaultlearninggames.org/fieldday/jowilder/<branch>/
+# Runs on a push to any branch or by hand (Actions → Publish to Vault CDN → Run workflow).
+# Deleting a branch removes its preview. Production releases are made from the Vault portal.
+on:
+  push:
+  delete:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    if: github.event_name != 'delete'
+    runs-on: ubuntu-latest
+    outputs:
+      artifact: jowilder-${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build
+        run: make build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: jowilder-${{ github.sha }}
+          path: dist
+          retention-days: 3
+
+  preview:
+    needs: build
+    uses: VaultLearningGames/vault-publisher/.github/workflows/publish-preview.yml@v1
+    with:
+      game: jowilder
+      artifact: ${{ needs.build.outputs.artifact }}
+
+  remove-preview:
+    if: github.event_name == 'delete'
+    uses: VaultLearningGames/vault-publisher/.github/workflows/publish-preview.yml@v1
+    with:
+      game: jowilder
