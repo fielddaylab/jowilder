@@ -30,7 +30,15 @@ body,div,canvas
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-72694027-9', 'auto', {cookieFlags: 'max-age=7200;secure;samesite=none'});  ga('send', 'pageview');
+  ga('create', 'UA-72694027-9', 'auto', {cookieFlags: 'max-age=7200;secure;samesite=none'});
+  // Opened by index.html (the click-to-play page, as in the Vault player), this page's referrer is index.html itself,
+  // which analytics ignores. Report where index.html came from instead (vaultlearninggames.org in the Vault player),
+  // so plays from Vault and from PBS Wisconsin (which opens this page directly) show up as different referrers.
+  try {
+    if (document.referrer && new URL(document.referrer).host === location.host && parent !== window && parent.document.referrer)
+      ga('set', 'referrer', parent.document.referrer);
+  } catch (e) {}
+  ga('send', 'pageview');
 </script>
 <script type="text/javascript" src="src/config.js"></script>
 <script type="text/javascript" src="src/utils/doutils.js"></script>
