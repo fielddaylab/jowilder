@@ -173,7 +173,7 @@ var MenuScene = function (game, stage) {
     code_button = new ButtonBox(x, y, 70, h, function (evt) {
       if (save_table[code_txt.txt.toLowerCase()]) {
         save_table_code = code_txt.txt.toLowerCase();
-        ga("send", "event", "savecode", "used", save_table_code);
+        gtag('event', 'save_code_used', { save_code: save_table_code });
         save_code = save_table[save_table_code].code;
         next = 1;
       }

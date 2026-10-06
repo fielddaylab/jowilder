@@ -1217,7 +1217,7 @@ var navigable = function()
     else
       my_debug_camera.ww = canv.width*my_debug_camera.wh/canv.height;
     my_music.consume_music(get_audio(self.room.audio_id,cur_level.audios));
-    ga('send', 'pageview', self.room.fqid);
+    gtag('event', 'room_view', { room: self.room.fqid });
   }
 
   self.unlock_content = function()
@@ -2332,7 +2332,7 @@ var notebookview = function()
     {
       var l = self.entrys[i].available;
       self.entrys[i].available = queryreqs(self.entrys[i], self.entrys[i].reqs);
-      if(!l && self.entrys[i].available) ga('send', 'event', 'capitol_entry', 'available', self.entrys[i].fqid, self.n_available_entrys+1);
+      if(!l && self.entrys[i].available) gtag('event', 'capitol_entry_available', { entry: self.entrys[i].fqid, entry_number: self.n_available_entrys+1 });
       if(self.entrys[i].available)
       {
         self.entrys[i].hoverexpand = 0;
@@ -4067,7 +4067,7 @@ var cutsceneview = function()
       case "tunic.capitol_1.hall.chap2_finale_c":
       case "tunic.capitol_2.hall.chap4_finale_c":
       case "tunic.capitol_3.hall.chap5_finale_c":
-        ga('send', 'event', 'finale', 'reached', self.cutscene.fqid);
+        gtag('event', 'finale_reached', { cutscene: self.cutscene.fqid });
         checkpoint_log_data = my_logger.get_log_data(
           LOG_TYPE_CHECKPOINT, my_logger.get_checkpoint_type_data(),
           LOG_SUBTYPE_BASIC, my_logger.get_checkpoint_subtype_data(),
