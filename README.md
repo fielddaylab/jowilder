@@ -10,6 +10,28 @@ Links:
 | dry | no snark or humor | https://jowilder-master.netlify.app/?script_type=dry |
 
 
+## Google Analytics: a Universal Analytics tag that should be replaced
+
+`iframe.html` loads Google's old Universal Analytics library (`analytics.js`) with the property **`UA-72694027-9`**.
+Universal Analytics shut down in July 2023, but as of 2026-10-06 Google still forwards these hits internally into the
+GA4 property **`G-4JW7HRZEM0`**, which is where Jo Wilder's analytics are read now. Google can stop that forwarding
+at any time without notice, so **this tag should be replaced** by a GA4 tag (`gtag.js`) sending to `G-4JW7HRZEM0`.
+
+When replacing it, keep what the reports rely on (a first attempt, closed PR #4, changed these and was dropped):
+
+- **Room changes are page views** whose path is the room's id (`ga('send', 'pageview', self.room.fqid)` in
+  `src/scenes/ui.js`), so the GA4 Pages report lists `/tunic.historicalsociety.entry` and so on. Send them as GA4
+  `page_view`s with the same path, not as a new event.
+- **The game's events:** `savecode`/`used` (`src/scenes/menuScene.js`), `capitol_entry`/`available` and
+  `finale`/`reached` (`src/scenes/ui.js`). Check in GA (Reports → Engagement → Events) how the forwarded ones are
+  named before choosing GA4 event names, so their history carries on.
+- **The referrer, which tells Vault players from PBS Wisconsin players.** In the Vault player, `index.html` (click to
+  play) opens `iframe.html`, so `iframe.html`'s own referrer is `index.html`. `iframe.html` therefore reports the
+  referrer `index.html` got (`https://vaultlearninggames.org/`) instead. PBS Wisconsin Education opens `iframe.html`
+  directly (fielddaylab.wisc.edu redirects it to the Vault CDN, without the Vault bar), so its referrer is
+  `https://pbswisconsineducation.org/`. A GA4 tag must keep this, e.g. by passing `page_referrer` in its `config`.
+- The cookie keeps `SameSite=None; Secure` (the game runs inside other sites' frames) and a 2-hour lifetime.
+
 ## Logging Events
 Each log is sent with a number of fields required by [simplelog](https://github.com/fielddaylab/simplelog). Simple log allows for a custom field called event_data_complex along with its category enumerator:
   event_custom: category enumerator
