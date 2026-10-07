@@ -13,25 +13,23 @@ var Hoverer = function(init)
   var EVT_TYPE_AMBIGUOUS = ENUM; ENUM++;
   var EVT_TYPE_UNHOVER   = ENUM; ENUM++;
   var evt_types = [];
-  self.attach = function() //will get auto-called on creation
+  // Pointer events are reliable in Safari when the canvas is inside the
+  // Vault's cross-origin iframe. Keep one input family at a time.
+  var pointer_input = typeof window.PointerEvent !== "undefined";
+  self.attach = function() //will get auto-called at creation
   {
-    if(platform == "PC")
-    {
-      self.source.addEventListener('mousemove', hover, false);
-      window.addEventListener('mousemove', detectOut, false);
-    }
-    else if(platform == "MOBILE")
-      ; //no hover on mobile, dummy
+    if (pointer_input)             self.source.addEventListener('pointermove', hover, false);
+    else if(platform == "PC")      self.source.addEventListener('mousemove', hover, false);
+    else if(platform == "MOBILE") ; //no hover on mobile, dummy
+    if (pointer_input)             window.addEventListener('pointermove', detectOut, false);
+    else if(platform == "PC")      window.addEventListener('mousemove', detectOut, false);
   }
   self.detach = function()
   {
-    if(platform == "PC")
-    {
-      self.source.removeEventListener('mousemove', hover);
-      window.removeEventListener('mousemove', detectOut, false);
-    }
-    else if(platform == "MOBILE")
-      ; //no hover on mobile, dummy
+    if (pointer_input)             self.source.removeEventListener('pointermove', hover);
+    else if(platform == "PC")      self.source.removeEventListener('mousemove', hover);
+    if (pointer_input)             window.removeEventListener('pointermove', detectOut, false);
+    else if(platform == "PC")      window.removeEventListener('mousemove', detectOut, false);
   }
 
   function hover(evt)

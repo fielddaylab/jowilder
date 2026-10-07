@@ -9,14 +9,20 @@ var Clicker = function(init)
   doMapInitDefaults(self,init,default_init);
 
   var evts = [];
+  // Pointer events are reliable in Safari, including when the canvas is inside
+  // the Vault's cross-origin iframe. Use one input family at a time so a
+  // pointerdown is not followed by a duplicate mousedown/touchstart action.
+  var pointer_input = typeof window.PointerEvent !== "undefined";
   self.attach = function() //will get auto-called at creation
   {
-    if(platform == "PC")          self.source.addEventListener('mousedown', click, false);
+    if (pointer_input)             self.source.addEventListener('pointerdown', click, false);
+    else if(platform == "PC")      self.source.addEventListener('mousedown', click, false);
     else if(platform == "MOBILE") self.source.addEventListener('touchstart', click, false);
   }
   self.detach = function()
   {
-    if(platform == "PC")          self.source.removeEventListener('mousedown', click);
+    if (pointer_input)             self.source.removeEventListener('pointerdown', click);
+    else if(platform == "PC")      self.source.removeEventListener('mousedown', click);
     else if(platform == "MOBILE") self.source.removeEventListener('touchstart', click);
   }
 
