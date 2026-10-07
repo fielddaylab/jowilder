@@ -1,4 +1,6 @@
-var LOAD_DATA_TYPE = Math.floor(Math.random() * 4);
+// The script experiment is over (2026-10-06): everyone gets the funny, not snarky script ("nosnark"), with no surveys.
+// ?script_type=original|nohumor|nosnark|dry still loads a given script, for looking at the other versions.
+var LOAD_DATA_TYPE = LOG_DATA_NOSNARK;
 
 function loadScriptSync(src) {
     var s = document.createElement('script');
@@ -9,17 +11,10 @@ function loadScriptSync(src) {
     console.log('Loaded script data from: '+src);
 }
 
-let referrer = new URL(document.referrer);
 let current_url = new URL(window.location.href);
 let script_type = current_url.searchParams.get("script_type");
 
-
-if(referrer.host === "pbswisconsineducation.org"){
-    QUIZ_GLOBAL_SHOW = false;
-    LOAD_DATA_TYPE = LOG_DATA_NORMAL;
-    console.log("Loading from pbswisconsineducation.org. Original script. No surveys.");
-}
-else if (script_type !== null) {
+if (script_type !== null && script_type !== "null") {
     console.log(script_type);
     console.log("Loading custom script "+script_type);
     if (script_type === "dry") {

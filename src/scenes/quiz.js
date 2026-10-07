@@ -1,4 +1,4 @@
-var QUIZ_GLOBAL_SHOW = true;
+var QUIZ_GLOBAL_SHOW = false; // the surveys ended with the script experiment (2026-10-06)
 
 var quiz0 = {
   quizn: 0,

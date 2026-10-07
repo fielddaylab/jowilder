@@ -1,6 +1,8 @@
 # JOWILDER
 
-Links:
+Everyone plays the **nosnark** script (funny, not snarky), with no surveys. Until 2026-10-06 the game was an
+experiment: each play picked one of the four scripts below at random and asked survey questions between chapters
+(PBS Wisconsin players got the original script, no surveys). Add `?script_type=<key>` to load a given script.
 
 | key | description | link |
 | --- | --- | --- |
@@ -27,9 +29,9 @@ When replacing it, keep what the reports rely on (a first attempt, closed PR #4,
   named before choosing GA4 event names, so their history carries on.
 - **The referrer, which tells Vault players from PBS Wisconsin players.** In the Vault player, `index.html` (click to
   play) opens `iframe.html`, so `iframe.html`'s own referrer is `index.html`. `iframe.html` therefore reports the
-  referrer `index.html` got (`https://vaultlearninggames.org/`) instead. PBS Wisconsin Education opens `iframe.html`
-  directly (fielddaylab.wisc.edu redirects it to the Vault CDN, without the Vault bar), so its referrer is
-  `https://pbswisconsineducation.org/`. A GA4 tag must keep this, e.g. by passing `page_referrer` in its `config`.
+  referrer `index.html` got (`https://vaultlearninggames.org/`) instead. Until 2026-10-06 PBS Wisconsin Education's
+  popup opened `iframe.html` directly, with referrer `https://pbswisconsineducation.org/`; since then it plays in the
+  Vault player too, so its plays report the Vault page as referrer. A GA4 tag must keep this, e.g. by passing `page_referrer` in its `config`.
 - The cookie keeps `SameSite=None; Secure` (the game runs inside other sites' frames) and a 2-hour lifetime.
 
 ## Logging Events
