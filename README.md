@@ -29,9 +29,10 @@ When replacing it, keep what the reports rely on (a first attempt, closed PR #4,
   named before choosing GA4 event names, so their history carries on.
 - **The referrer, which tells Vault players from PBS Wisconsin players.** In the Vault player, `index.html` (click to
   play) opens `iframe.html`, so `iframe.html`'s own referrer is `index.html`. `iframe.html` therefore reports the
-  referrer `index.html` got (`https://vaultlearninggames.org/`) instead. Until 2026-10-06 PBS Wisconsin Education's
-  popup opened `iframe.html` directly, with referrer `https://pbswisconsineducation.org/`; since then it plays in the
-  Vault player too, so its plays report the Vault page as referrer. A GA4 tag must keep this, e.g. by passing `page_referrer` in its `config`.
+  referrer `index.html` got (`https://vaultlearninggames.org/`) instead. PBS Wisconsin Education's "Play the game"
+  popup plays in the Vault player too (since 2026-10-06; before, it opened `iframe.html` bare). The Vault player
+  passes the site that sent it, `?vault_referrer=https://pbswisconsineducation.org/`, to the game; `index.html`
+  forwards it and `iframe.html` reports it as the referrer, so PBS plays still show up as pbswisconsineducation.org. A GA4 tag must keep this, e.g. by passing `page_referrer` in its `config`.
 - The cookie keeps `SameSite=None; Secure` (the game runs inside other sites' frames) and a 2-hour lifetime.
 
 ## Logging Events

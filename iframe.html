@@ -34,8 +34,13 @@ body,div,canvas
   // Opened by index.html (the click-to-play page, as in the Vault player), this page's referrer is index.html itself,
   // which analytics ignores. Report where index.html came from instead (vaultlearninggames.org in the Vault player),
   // so plays from Vault and from PBS Wisconsin (which opens this page directly) show up as different referrers.
+  // When another site sent the Vault player here (PBS Wisconsin Education's "Play the game" popup), the player passes
+  // that site on as ?vault_referrer= (through index.html), and that is reported instead, so PBS plays stay PBS plays.
   try {
-    if (document.referrer && new URL(document.referrer).host === location.host && parent !== window && parent.document.referrer)
+    var vault_referrer = new URL(location.href).searchParams.get('vault_referrer');
+    if (vault_referrer && /^https:\/\//.test(vault_referrer))
+      ga('set', 'referrer', vault_referrer);
+    else if (document.referrer && new URL(document.referrer).host === location.host && parent !== window && parent.document.referrer)
       ga('set', 'referrer', parent.document.referrer);
   } catch (e) {}
   ga('send', 'pageview');
