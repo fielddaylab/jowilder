@@ -33,11 +33,14 @@ window.onload = function()
     iframe.src = "iframe.html";
     // forward the script_version param
     let current_url = new URL(window.location.href);
+    let params = new URLSearchParams();
     let script_type = current_url.searchParams.get("script_type")
-    iframe.src += '?script_type='+script_type
+    if (script_type) params.set("script_type", script_type);
     // and the site that sent the Vault player here (PBS Wisconsin Education), for iframe.html's analytics
-    let vault_referrer = current_url.searchParams.get("vault_referrer")
-    if (vault_referrer) iframe.src += '&vault_referrer='+encodeURIComponent(vault_referrer)
+    let vault_referrer = current_url.searchParams.get("vault_referrer");
+    if (vault_referrer) params.set("vault_referrer", vault_referrer);
+    let qs = params.toString();
+    if (qs) iframe.src += '?' + qs;
 
     //remove_vault_button()
     clickload.removeEventListener("click",loadiframe);
