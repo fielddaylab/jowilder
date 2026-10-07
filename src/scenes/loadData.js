@@ -1,5 +1,5 @@
 // The script experiment is over (2026-10-06): everyone gets the funny, not snarky script ("nosnark"), with no surveys.
-// ?script_type=original|nohumor|nosnark|dry still loads a given script, for looking at the other versions.
+// Script-selection URL parameters are intentionally ignored: the public game always uses this version.
 var LOAD_DATA_TYPE = LOG_DATA_NOSNARK;
 
 function loadScriptSync(src) {
@@ -11,28 +11,8 @@ function loadScriptSync(src) {
     console.log('Loaded script data from: '+src);
 }
 
-let current_url = new URL(window.location.href);
-let script_type = current_url.searchParams.get("script_type");
-
-if (script_type !== null && script_type !== "null") {
-    console.log(script_type);
-    console.log("Loading custom script "+script_type);
-    if (script_type === "dry") {
-        LOAD_DATA_TYPE = LOG_DATA_DRY;
-    }
-    else if (script_type === "nohumor") {
-        LOAD_DATA_TYPE = LOG_DATA_NOHUMOR;
-    }
-    else if (script_type === "nosnark") {
-        LOAD_DATA_TYPE = LOG_DATA_NOSNARK;
-    }
-    else if (script_type === "original") {
-        LOAD_DATA_TYPE = LOG_DATA_NORMAL;
-    }
-    else {
-        console.log("Invalid script_type "+script_type);
-    }
-}
+// The public build always uses the funny, non-snarky script. Keep script_type out of the
+// public contract so old survey links cannot select a different version.
 if (LOAD_DATA_TYPE == LOG_DATA_DRY) {
     loadScriptSync('src/scenes/data_dry.js');
 }
