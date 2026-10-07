@@ -35,6 +35,9 @@ window.onload = function()
     let current_url = new URL(window.location.href);
     let script_type = current_url.searchParams.get("script_type")
     iframe.src += '?script_type='+script_type
+    // and the site that sent the Vault player here (PBS Wisconsin Education), for iframe.html's analytics
+    let vault_referrer = current_url.searchParams.get("vault_referrer")
+    if (vault_referrer) iframe.src += '&vault_referrer='+encodeURIComponent(vault_referrer)
 
     //remove_vault_button()
     clickload.removeEventListener("click",loadiframe);
