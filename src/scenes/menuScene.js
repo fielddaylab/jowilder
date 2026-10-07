@@ -130,6 +130,9 @@ var MenuScene = function (game, stage) {
         use_quiz = 1; // toggle quiz
         next = 0; // toggle quiz
         reset_quiz(quiz);
+      } else {
+        // With the survey disabled, New Game starts immediately.
+        next = 1;
       }
       // next=0;
       let scale = 0.25;
