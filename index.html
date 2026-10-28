@@ -36,9 +36,14 @@ window.onload = function()
     let params = new URLSearchParams();
     let script_type = current_url.searchParams.get("script_type")
     if (script_type) params.set("script_type", script_type);
-    // and the site that sent the Vault player here (PBS Wisconsin Education), for iframe.html's analytics
-    let vault_referrer = current_url.searchParams.get("vault_referrer");
-    if (vault_referrer) params.set("vault_referrer", vault_referrer);
+    // and the acquisition source the Vault player passed us, for iframe.html's analytics. The player's embed
+    // contract is ?vault_src=<source origin>&vault_ch=<channel>; vault_referrer is the older name for vault_src
+    // and is still forwarded so an older player keeps working. EVERY layer must forward the SAME set of params —
+    // forwarding only some of them is why vault_ch was invisible to the game before.
+    ["vault_src", "vault_ch", "vault_referrer"].forEach(function(name) {
+      let value = current_url.searchParams.get(name);
+      if (value) params.set(name, value);
+    });
     let qs = params.toString();
     if (qs) iframe.src += '?' + qs;
 
