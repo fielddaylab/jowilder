@@ -43,34 +43,62 @@ body,div,canvas
   // analytics discards it as a self-referral — every Vault play lands in "(direct)" and Vault's contribution is
   // invisible. So the channel is reported as an explicit campaign source instead (utm_source on the reported
   // page location, which analytics prefers over the referrer and never treats as a self-referral). Plays then
-  // group by a named source: "vault" for plays that came through the Vault site, "pbswi" for PBS Wisconsin
-  // Education, and so on.
+  // group by a named source. A partner channel is reported as the partner's own hostname
+  // ("pbswisconsineducation.org"), because a referral session that reached us before the player existed was
+  // recorded by analytics under that bare host — using the host keeps both sides of the change one continuous
+  // row instead of two strings for the same traffic. Partner links that hardcode a short key
+  // (?vault_ch=pbswi) are normalised through VAULT_CHANNEL_ALIASES below, so they keep working untouched.
+  // "vault" keeps its own name: it has no referral-era row to match (it was the self-referral analytics was
+  // discarding) and the site's own host would collide with ordinary on-site navigation.
+  /* VAULT_CHANNEL_LOGIC_START */
   var VAULT_CHANNELS = {
-    'https://pbskids.org': 'pbskids',
-    'https://www.pbskids.org': 'pbskids',
-    'https://pbswisconsineducation.org': 'pbswi',
-    'https://www.pbswisconsineducation.org': 'pbswi',
-    'https://pbslearningmedia.org': 'pbslm',
-    'https://www.pbslearningmedia.org': 'pbslm',
-    'https://sciencegamecenter.org': 'sciencegamecenter',
-    'https://www.sciencegamecenter.org': 'sciencegamecenter'
+    'https://pbskids.org': 'pbskids.org',
+    'https://www.pbskids.org': 'pbskids.org',
+    'https://pbswisconsineducation.org': 'pbswisconsineducation.org',
+    'https://www.pbswisconsineducation.org': 'pbswisconsineducation.org',
+    'https://pbslearningmedia.org': 'pbslearningmedia.org',
+    'https://www.pbslearningmedia.org': 'pbslearningmedia.org',
+    'https://sciencegamecenter.org': 'sciencegamecenter.org',
+    'https://www.sciencegamecenter.org': 'sciencegamecenter.org'
   };
+  // Short keys partner links already carry, mapped to the hostname we report them as.
+  var VAULT_CHANNEL_ALIASES = {
+    pbswi: 'pbswisconsineducation.org',
+    pbskids: 'pbskids.org',
+    pbslm: 'pbslearningmedia.org',
+    sciencegamecenter: 'sciencegamecenter.org'
+  };
+  // The partner hostnames are real referrals, so they are reported with the referral medium analytics groups
+  // them under. "vault", "other" and direct plays are not referrals and keep the honest "vault-player".
+  var VAULT_PARTNER_CHANNELS = Object.keys(VAULT_CHANNEL_ALIASES).map(function (k) { return VAULT_CHANNEL_ALIASES[k]; });
+  function vaultResolveChannel(rawCh, source, embedded) {
+    var channel = rawCh || '';
+    // An explicit vault_ch is reported exactly as given, so the short keys are normalised here — right where
+    // the value is read, before anything is reported, and not only on the VAULT_CHANNELS fallback below.
+    if (Object.prototype.hasOwnProperty.call(VAULT_CHANNEL_ALIASES, channel)) channel = VAULT_CHANNEL_ALIASES[channel];
+    // No channel, but a source we recognise: name it anyway.
+    if (!channel && /^https:\/\//.test(source)) channel = VAULT_CHANNELS[new URL(source).origin] || 'other';
+    // Inside the Vault player with no outside source: the play came through Vault itself.
+    if (!channel && embedded) channel = 'vault';
+    return {
+      channel: channel,
+      medium: VAULT_PARTNER_CHANNELS.indexOf(channel) !== -1 ? 'referral' : 'vault-player'
+    };
+  }
+  /* VAULT_CHANNEL_LOGIC_END */
   try {
     var params = new URL(location.href).searchParams;
     var source = params.get('vault_src') || params.get('vault_referrer') || '';
-    var channel = params.get('vault_ch') || '';
     // The source site's own address is still worth reporting as the referrer when we were given one.
     if (/^https:\/\//.test(source)) ga('set', 'referrer', source);
     else if (document.referrer && new URL(document.referrer).host === location.host && parent !== window && parent.document.referrer)
       ga('set', 'referrer', parent.document.referrer);
-    // No channel, but a source we recognise: name it anyway.
-    if (!channel && /^https:\/\//.test(source)) channel = VAULT_CHANNELS[new URL(source).origin] || 'other';
-    // Inside the Vault player with no outside source: the play came through Vault itself.
-    if (!channel && parent !== window) channel = 'vault';
+    var resolved = vaultResolveChannel(params.get('vault_ch'), source, parent !== window);
+    var channel = resolved.channel;
     if (channel) {
       var reported = new URL(location.href);
       reported.searchParams.set('utm_source', channel);
-      reported.searchParams.set('utm_medium', 'vault-player');
+      reported.searchParams.set('utm_medium', resolved.medium);
       ga('set', 'location', reported.href);
       ga('set', 'dimension1', channel);   // registered as "Play source" on the property
     }
