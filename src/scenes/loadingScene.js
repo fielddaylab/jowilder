@@ -105,7 +105,7 @@ var LoadingScene = function(game, stage)
 
     //put asset paths in loading_img_srcs (for assets used on loading screen itself)
     loading_img_srcs.push("assets/logo_fd.png");
-    loading_img_srcs.push("assets/logo_wpt.png");
+    loading_img_srcs.push("assets/logo_pbswi.png");
     for(var i = 0; i < loading_img_srcs.length; i++)
     {
       loading_imgs[i] = new Image();
